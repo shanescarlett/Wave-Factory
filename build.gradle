@@ -21,6 +21,7 @@ allprojects {
         google()
         jcenter()
         maven { url "C:\\Users\\Main\\.m2\\repository" }
+        maven { url 'https://jitpack.io' }
     }
 }
 
