@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("unused, WeakerAccess")
 public class WaveFactory
 {
 	private static WaveFactory INSTANCE = null;
@@ -18,6 +18,11 @@ public class WaveFactory
 	private WaveFactory()
 	{
 		mLoadedSounds = new SparseArray<>();
+	}
+
+	private interface SampleMapFunction
+	{
+		float map(int index);
 	}
 
 	public static WaveFactory getInstance()
@@ -29,104 +34,125 @@ public class WaveFactory
 		return INSTANCE;
 	}
 
-	public static byte[] getSineTone(double frequency, double duration, int sampleRate, float ramp)
+	/**
+	 * Generate a sine wave of specified frequency, duration, and sample rate, with a fade-in and
+	 * fade-out ramp of specified fraction at the start and end.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param duration duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param ramp fraction of the waveform to ramp (0.0~0.5 range)
+	 * @return PCM array of the generated waveform
+	 */
+	public static byte[] getSineWave(final float frequency, float duration, final int sampleRate, float ramp)
 	{
-		int numSamples = (int) (Math.round(duration * sampleRate));
-		double sample[] = new double[numSamples];
-		byte generatedSnd[] = new byte[2 * numSamples];
-		ramp = Math.min(0.5f, Math.max(0, ramp));
-
-		//Generate Waveform
-		for (int i = 0; i < numSamples; ++i)
+		validateInputs(frequency, duration, sampleRate, ramp);
+		int numSamples = Math.round(duration * sampleRate);
+		byte waveBytes[] = new byte[2 * numSamples];
+		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
-			sample[i] = Math.sin(frequency * 2 * Math.PI * i / (sampleRate));
-		}
-		// convert to 16 bit pcm sound array
-		// assumes the sample buffer is normalised.
-		int idx = 0;
-		int i;
-
-		int rampSamples = Math.round((float)numSamples * ramp);                                    // Amplitude ramp as a percent of sample count
-
-		//Apply Fade In
-		for (i = 0; i < rampSamples; ++i)
-		{
-			double dVal = sample[i];
-			// Ramp up to maximum
-			final short val = (short) ((dVal * Short.MAX_VALUE * i / rampSamples));
-			// in 16 bit wav PCM, first byte is the low order byte
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-		}
-
-
-		for (; i < numSamples - rampSamples; ++i)
-		{
-			double dVal = sample[i];
-			// scale to maximum amplitude
-			final short val = (short) ((dVal * Short.MAX_VALUE));
-			// in 16 bit wav PCM, first byte is the low order byte
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-		}
-
-		//Apply Fade Out
-		for (; i < numSamples; ++i)
-		{                               // Ramp amplitude down
-			double dVal = sample[i];
-			// Ramp down to zero
-			final short val = (short) ((dVal * Short.MAX_VALUE * (numSamples - i) / rampSamples));
-			// in 16 bit wav PCM, first byte is the low order byte
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-		}
-		return generatedSnd;
+			@Override
+			public float map(int index)
+			{
+				return (float)Math.sin(frequency * 2 * Math.PI * index / (sampleRate));
+			}
+		};
+		generateWave(waveBytes, mapFunction, ramp);
+		return waveBytes;
 	}
 
-	public static byte[] getSquareWave(double frequency, double duration, int sampleRate)
+	/**
+	 * Generate a square wave of specified frequency, duration, and sample rate, with a fade-in and
+	 * fade-out ramp of specified fraction at the start and end.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param duration duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param ramp fraction of the waveform to ramp (0.0~0.5 range)
+	 * @return PCM array of the generated waveform
+	 */
+	public static byte[] getSquareWave(final float frequency, float duration, final int sampleRate, float ramp)
 	{
-		int numSamples = (int) (Math.round(duration * sampleRate));
-		double sample[] = new double[numSamples];
-		byte generatedSnd[] = new byte[2 * numSamples];
-
-		for (int i = 0; i < numSamples; ++i)
+		validateInputs(frequency, duration, sampleRate, ramp);
+		int numSamples = Math.round(duration * sampleRate);
+		byte waveBytes[] = new byte[2 * numSamples];
+		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
-			sample[i] = Math.signum(Math.sin(frequency * 2 * Math.PI * i / (sampleRate)));
-		}
-		int idx = 0;
-
-		for (int i = 0; i < numSamples; ++i)
-		{
-			double dVal = sample[i];
-			final short val = (short) ((dVal * Short.MAX_VALUE));
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-		}
-		return generatedSnd;
+			@Override
+			public float map(int index)
+			{
+				return (float)Math.signum(Math.sin(frequency * 2 * Math.PI * index / (sampleRate)));
+			}
+		};
+		generateWave(waveBytes, mapFunction, ramp);
+		return waveBytes;
 	}
 
-	public static byte[] getTriangleWave(double frequency, double duration, int sampleRate)
+	/**
+	 * Generate a triangular wave of specified frequency, duration, and sample rate, with a fade-in and
+	 * fade-out ramp of specified fraction at the start and end.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param duration duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param ramp fraction of the waveform to ramp (0.0~0.5 range)
+	 * @return PCM array of the generated waveform
+	 */
+	public static byte[] getTriangularWave(final float frequency, float duration, final int sampleRate, float ramp)
 	{
-		int numSamples = (int) (Math.round(duration * sampleRate));
-		double sample[] = new double[numSamples];
-		byte generatedSnd[] = new byte[2 * numSamples];
-
-		for (int i = 0; i < numSamples; ++i)
+		validateInputs(frequency, duration, sampleRate, ramp);
+		int numSamples = Math.round(duration * sampleRate);
+		byte waveBytes[] = new byte[2 * numSamples];
+		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
-			sample[i] = (2 / Math.PI) * Math.asin(Math.sin(frequency * 2 * Math.PI * i / (sampleRate)));
-		}
-		int idx = 0;
-
-		for (int i = 0; i < numSamples; ++i)
-		{
-			double dVal = sample[i];
-			final short val = (short) ((dVal * Short.MAX_VALUE));
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-		}
-		return generatedSnd;
+			@Override
+			public float map(int index)
+			{
+				return (float)((2 / Math.PI) * Math.asin(Math.sin(frequency * 2 * Math.PI * index / (sampleRate))));
+			}
+		};
+		generateWave(waveBytes, mapFunction, ramp);
+		return waveBytes;
 	}
 
+	/**
+	 * Generate a sawtooth wave of specified frequency, duration, and sample rate, with a fade-in and
+	 * fade-out ramp of specified fraction at the start and end.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param duration duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param ramp fraction of the waveform to ramp (0.0~0.5 range)
+	 * @return PCM array of the generated waveform
+	 */
+	public static byte[] getSawtoothWave(final float frequency, float duration, final int sampleRate, float ramp)
+	{
+		validateInputs(frequency, duration, sampleRate, ramp);
+		int numSamples = Math.round(duration * sampleRate);
+		byte waveBytes[] = new byte[2 * numSamples];
+		SampleMapFunction mapFunction = new SampleMapFunction()
+		{
+			@Override
+			public float map(int index)
+			{
+				return (float)((2 / Math.PI) * Math.atan(Math.tan(frequency * Math.PI * index / (sampleRate))));
+			}
+		};
+		generateWave(waveBytes, mapFunction, ramp);
+		return waveBytes;
+	}
+
+	/**
+	 * Generate a sine wave of specified frequency and sample rate, with a minimum duration of
+	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
+	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
+	 * (e.g. in a looped tone) is more important than the absolute length.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param minDuration minimum duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @return PCM array of the generated waveform
+	 */
 	public static byte[] getSineToneRound(double frequency, double minDuration, int sampleRate)
 	{
 		//Buffer has extra space for 100 extra cycles to detect proper zero crossover
@@ -187,13 +213,84 @@ public class WaveFactory
 		return generatedSnd;
 	}
 
-	public static void mixWaves(float[] sound, float[] into, int offset)
+	private static void validateInputs(float frequency, float duration, int sampleRate, float ramp)
 	{
-		int writeableSamples = Math.min(sound.length, into.length - offset);
+		if(frequency <= 0)
+		{
+			throw new IllegalArgumentException("Frequency must be greater than zero.");
+		}
+		if(frequency > sampleRate/2)
+		{
+			throw new IllegalArgumentException("Frequency must be smaller than the nyquist frequency; i.e., half of the sampling rate.");
+		}
+		if(sampleRate <= 0)
+		{
+			throw new IllegalArgumentException("Sampling rate must be greater than zero.");
+		}
+		if(ramp < 0 || ramp > 0.5)
+		{
+			throw new IllegalArgumentException("Ramp must be a positive fraction between 0 and 0.5.");
+		}
+	}
+
+	private static void generateWave(byte[] output, SampleMapFunction mapFunction, float ramp)
+	{
+		int numSamples = output.length / 2;
+		int idx = 0;
+		int i;
+
+		int rampSamples = Math.round((float)numSamples * ramp);                                    // Amplitude ramp as a percent of sample count
+
+		//Apply Fade In
+		for (i = 0; i < rampSamples; ++i)
+		{
+			double dVal = mapFunction.map(i);
+			// Ramp up to maximum
+			final short val = (short) ((dVal * Short.MAX_VALUE * i / rampSamples));
+			// in 16 bit wav PCM, first byte is the low order byte
+			output[idx++] = (byte) (val & 0x00ff);
+			output[idx++] = (byte) ((val & 0xff00) >>> 8);
+		}
+
+
+		for (; i < numSamples - rampSamples; ++i)
+		{
+			double dVal = mapFunction.map(i);
+			// scale to maximum amplitude
+			final short val = (short) ((dVal * Short.MAX_VALUE));
+			// in 16 bit wav PCM, first byte is the low order byte
+			output[idx++] = (byte) (val & 0x00ff);
+			output[idx++] = (byte) ((val & 0xff00) >>> 8);
+		}
+
+		//Apply Fade Out
+		for (; i < numSamples; ++i)
+		{                               // Ramp amplitude down
+			double dVal = mapFunction.map(i);
+			// Ramp down to zero
+			final short val = (short) ((dVal * Short.MAX_VALUE * (numSamples - i) / rampSamples));
+			// in 16 bit wav PCM, first byte is the low order byte
+			output[idx++] = (byte) (val & 0x00ff);
+			output[idx++] = (byte) ((val & 0xff00) >>> 8);
+		}
+	}
+
+	/**
+	 * Mix a sound into another sound via addition and hyperbolic tangent compression.
+	 * If the full length of the sample cannot fit into the destination at the specified offset,
+	 * the sample will be truncated.
+	 *
+	 * @param sound sound sample to mix
+	 * @param destination destination array
+	 * @param offset offset index from the start at which to start writing the sound sample
+	 */
+	public static void mixWaves(float[] sound, float[] destination, int offset)
+	{
+		int writeableSamples = Math.min(sound.length, destination.length - offset);
 
 		for(int c = 0; c < writeableSamples; c++)
 		{
-			into[c + offset] = (float)Math.tanh(sound[c] + into[c + offset]);
+			destination[c + offset] = (float)Math.tanh(sound[c] + destination[c + offset]);
 		}
 	}
 
