@@ -1,5 +1,6 @@
 package android.scarlettsystems.net.wavefactory;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity
 		drawSquareWave();
 		drawTriangularWave();
 		drawSawtoothWave();
+		drawRawWave();
 	}
 
 	private void drawSineWave()
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity
 			entries.add(new Entry((float)c / 44100f, wave[c]));
 		}
 		LineDataSet dataSet = new LineDataSet(entries, "Sine Wave");
+		dataSet.setDrawCircles(false);
+		dataSet.setColor(Color.BLACK);
 		LineData lineData = new LineData(dataSet);
 		chart.setData(lineData);
 		chart.invalidate();
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity
 			entries.add(new Entry((float)c / 44100f, wave[c]));
 		}
 		LineDataSet dataSet = new LineDataSet(entries, "Square Wave");
+		dataSet.setDrawCircles(false);
+		dataSet.setColor(Color.BLACK);
 		LineData lineData = new LineData(dataSet);
 		chart.setData(lineData);
 		chart.invalidate();
@@ -67,6 +73,8 @@ public class MainActivity extends AppCompatActivity
 			entries.add(new Entry((float)c / 44100f, wave[c]));
 		}
 		LineDataSet dataSet = new LineDataSet(entries, "Triangular Wave");
+		dataSet.setDrawCircles(false);
+		dataSet.setColor(Color.BLACK);
 		LineData lineData = new LineData(dataSet);
 		chart.setData(lineData);
 		chart.invalidate();
@@ -82,6 +90,25 @@ public class MainActivity extends AppCompatActivity
 			entries.add(new Entry((float)c / 44100f, wave[c]));
 		}
 		LineDataSet dataSet = new LineDataSet(entries, "Sawtooth Wave");
+		dataSet.setDrawCircles(false);
+		dataSet.setColor(Color.BLACK);
+		LineData lineData = new LineData(dataSet);
+		chart.setData(lineData);
+		chart.invalidate();
+	}
+
+	private void drawRawWave()
+	{
+		float[] wave = WaveFactory.getInstance().getWaveFromResource(R.raw.sound_drum_beat, this);
+		LineChart chart = findViewById(R.id.wav);
+		List<Entry> entries = new ArrayList<>();
+		for(int c = 0; c < wave.length; c++)
+		{
+			entries.add(new Entry((float)c / 44100f, wave[c]));
+		}
+		LineDataSet dataSet = new LineDataSet(entries, "Wave File");
+		dataSet.setDrawCircles(false);
+		dataSet.setColor(Color.BLACK);
 		LineData lineData = new LineData(dataSet);
 		chart.setData(lineData);
 		chart.invalidate();
