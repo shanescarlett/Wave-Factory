@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import net.scarlettsystems.android.wavefactory.WaveFactory;
+import net.scarlettsystems.android.wavefactory.WaveLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void drawSineWave()
 	{
-		float[] wave = WaveFactory.pcmToFloat(WaveFactory.getSineWave(200, 0.01f, 44100, 0));
+		float[] wave = WaveFactory.getSineWavePCMFloat(200, 0.01f, 44100, 0);
 		LineChart chart = findViewById(R.id.sine);
 		List<Entry> entries = new ArrayList<>();
 		for(int c = 0; c < wave.length; c++)
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void drawSquareWave()
 	{
-		float[] wave = WaveFactory.pcmToFloat(WaveFactory.getSquareWave(200, 0.01f, 44100, 0));
+		float[] wave = WaveFactory.getSquareWavePCMFloat(200, 0.01f, 44100, 0);
 		LineChart chart = findViewById(R.id.square);
 		List<Entry> entries = new ArrayList<>();
 		for(int c = 0; c < wave.length; c++)
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void drawTriangularWave()
 	{
-		float[] wave = WaveFactory.pcmToFloat(WaveFactory.getTriangularWave(200, 0.01f, 44100, 0));
+		float[] wave = WaveFactory.getTriangularWavePCMFloat(200, 0.01f, 44100, 0);
 		LineChart chart = findViewById(R.id.triangular);
 		List<Entry> entries = new ArrayList<>();
 		for(int c = 0; c < wave.length; c++)
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void drawSawtoothWave()
 	{
-		float[] wave = WaveFactory.pcmToFloat(WaveFactory.getSawtoothWave(200, 0.01f, 44100, 0));
+		float[] wave = WaveFactory.getSawtoothWavePCMFloat(200, 0.01f, 44100, 0);
 		LineChart chart = findViewById(R.id.sawtooth);
 		List<Entry> entries = new ArrayList<>();
 		for(int c = 0; c < wave.length; c++)
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void drawRawWave()
 	{
-		float[] wave = WaveFactory.getInstance().getWaveFromResource(R.raw.sound_drum_beat, this);
+		float[] wave = WaveLoader.getInstance().getWaveFromResource(R.raw.sound_drum_beat, this);
 		LineChart chart = findViewById(R.id.wav);
 		List<Entry> entries = new ArrayList<>();
 		for(int c = 0; c < wave.length; c++)

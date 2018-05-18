@@ -25,4 +25,5 @@ configurations.all {
 dependencies {
     implementation('net.scarlettsystems.android:wavefactory:0.0.1') { changing = true }
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation "com.android.support:appcompat-v7:27.0.2"
 }
