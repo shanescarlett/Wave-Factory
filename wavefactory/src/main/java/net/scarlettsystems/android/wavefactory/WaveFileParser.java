@@ -3,11 +3,15 @@ package net.scarlettsystems.android.wavefactory;
 @SuppressWarnings("unused")
 class WaveFileParser
 {
+	private int mFormat = -1;
 	private int mChannelCount = 0;
 	private long mSampleRate = 0;
 	private int mBitsPerSample = 0;
 	private long mDataLength = 0;
 	private int mDataStartIndex = 0;
+
+	public static final int FMT_UNKNOWN = -1;
+	public static final int FMT_PCM = 1;
 
 	WaveFileParser(byte[] bytes)
 	{
@@ -21,9 +25,10 @@ class WaveFileParser
 					&& bytes[c+2] == formatChars[2]
 					&& bytes[c+3] == formatChars[3])
 			{
+				mFormat = getUInt16(bytes[c+8], bytes[c+9]);
 				mChannelCount = getUInt16(bytes[c+10], bytes[c+11]);
-				mSampleRate = getUInt32(bytes[c+16], bytes[c+17], bytes[c+18], bytes[c+19]);
-				mBitsPerSample = getUInt16(bytes[c+34], bytes[c+35]);
+				mSampleRate = getUInt32(bytes[c+12], bytes[c+13], bytes[c+14], bytes[c+15]);
+				mBitsPerSample = getUInt16(bytes[c+22], bytes[c+23]);
 			}
 
 			if(bytes[c] == dataChars[0]
