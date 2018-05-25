@@ -35,7 +35,7 @@ public class WaveFactory
 	public static byte[] getSineWavePCM16(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		byte waveBytes[] = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -62,7 +62,7 @@ public class WaveFactory
 	public static float[] getSineWavePCMFloat(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		float waveFloats[] = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -89,7 +89,7 @@ public class WaveFactory
 	public static byte[] getSquareWavePCM16(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		byte waveBytes[] = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -116,7 +116,7 @@ public class WaveFactory
 	public static float[] getSquareWavePCMFloat(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		float waveFloats[] = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -143,7 +143,7 @@ public class WaveFactory
 	public static byte[] getTriangularWavePCM16(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		byte waveBytes[] = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -170,7 +170,7 @@ public class WaveFactory
 	public static float[] getTriangularWavePCMFloat(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		float waveFloats[] = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -197,7 +197,7 @@ public class WaveFactory
 	public static byte[] getSawtoothWavePCM16(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		byte waveBytes[] = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -224,7 +224,7 @@ public class WaveFactory
 	public static float[] getSawtoothWavePCMFloat(final float frequency, float duration, final int sampleRate, float ramp)
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
-		int numSamples = Math.round(duration * sampleRate);
+		int numSamples = (int)Math.floor(duration * sampleRate);
 		float waveFloats[] = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
@@ -311,7 +311,7 @@ public class WaveFactory
 	public static float[] getSineToneRoundPCMFloat(double frequency, double minDuration, int sampleRate)
 	{
 		//Buffer has extra space for 100 extra cycles to detect proper zero crossover
-		int minDurationSampleCount = (int) (Math.round(minDuration * sampleRate));
+		int minDurationSampleCount = (int) (Math.floor(minDuration * sampleRate));
 		int numSamples = minDurationSampleCount * 2;
 		int firstCrossoverIndex = 0;
 		int properCrossoverIndex = 0;
@@ -356,7 +356,7 @@ public class WaveFactory
 	 */
 	public static byte[] getSilencePCM16(float duration, int sampleRate)
 	{
-		int numSamples = (int) (Math.ceil(duration * sampleRate));
+		int numSamples = (int) (Math.floor(duration * sampleRate));
 		byte generatedSnd[] = new byte[2 * numSamples];
 		int idx = 0;
 		for (int i = 0; i < numSamples; ++i)
@@ -376,7 +376,7 @@ public class WaveFactory
 	 */
 	public static float[] getSilencePCMFloat(float duration, int sampleRate)
 	{
-		int numSamples = (int) (Math.ceil(duration * sampleRate));
+		int numSamples = (int) (Math.floor(duration * sampleRate));
 		float generatedSnd[] = new float[numSamples];
 		int idx = 0;
 		for (int i = 0; i < numSamples; i++)
