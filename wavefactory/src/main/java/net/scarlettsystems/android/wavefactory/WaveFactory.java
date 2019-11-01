@@ -348,6 +348,53 @@ public class WaveFactory
 	}
 
 	/**
+	 * Generate a sine wave of specified frequency and sample rate, with a minimum duration of
+	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
+	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
+	 * (e.g. in a looped tone) is more important than the absolute length.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param minDuration minimum duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @return 32-bit float PCM array of the generated waveform
+	 */
+	public static float[] getSquareToneRoundPCMFloat(double frequency, double minDuration, int sampleRate)
+	{
+		//Buffer has extra space for 100 extra cycles to detect proper zero crossover
+		int minDurationSampleCount = (int) (Math.floor(minDuration * sampleRate));
+		int numSamples = minDurationSampleCount * 2;
+		int firstCrossoverIndex = 0;
+		int properCrossoverIndex = 0;
+		float sample[] = new float[numSamples];
+
+		float prevValue = 0;
+		for(int c = minDurationSampleCount; c < numSamples; c++)
+		{
+			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
+			if(value >= 0){value = 1;}
+			else{value = -1;}
+			//Find first point where wave crosses from negative to zero (a cycle is finished).
+			//This index is kept just in case a minimal crossover point is not found.
+			if(firstCrossoverIndex == 0 && prevValue < 0 && value >= 0)
+			{
+				firstCrossoverIndex = c;
+			}
+			prevValue = value;
+		}
+		float output[] = new float[firstCrossoverIndex];
+
+		//Generate Waveform
+		for (int c = 0; c < firstCrossoverIndex; c++)
+		{
+			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
+			if(value >= 0){value = 1;}
+			else{value = -1;}
+			output[c] = value;
+		}
+		return output;
+	}
+
+	/**
 	 * Generate a block of silence of the specified duration and sampling rate
 	 *
 	 * @param duration duration in seconds
