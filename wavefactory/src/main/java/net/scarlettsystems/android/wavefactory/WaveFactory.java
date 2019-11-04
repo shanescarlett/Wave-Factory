@@ -304,6 +304,11 @@ public class WaveFactory
 		return output;
 	}
 
+	public static byte[] getSquareToneRoundPCM16(double frequency, double minDuration, int sampleRate)
+	{
+		return WaveLoader.floatToPcm(getSquareToneRoundPCMFloat(frequency, minDuration, sampleRate));
+	}
+
 	/**
 	 * Generate a sine wave of specified frequency and sample rate, with a minimum duration of
 	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
@@ -328,8 +333,8 @@ public class WaveFactory
 		for(int c = minDurationSampleCount; c < numSamples; c++)
 		{
 			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
-			if(value >= 0){value = 1;}
-			else{value = -1;}
+			if(value >= 0){value = 0.99f;}
+			else{value = -0.99f;}
 			//Find first point where wave crosses from negative to zero (a cycle is finished).
 			//This index is kept just in case a minimal crossover point is not found.
 			if(firstCrossoverIndex == 0 && prevValue < 0 && value >= 0)
@@ -344,8 +349,8 @@ public class WaveFactory
 		for (int c = 0; c < firstCrossoverIndex; c++)
 		{
 			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
-			if(value >= 0){value = 1;}
-			else{value = -1;}
+			if(value >= 0){value = 0.99f;}
+			else{value = -0.99f;}
 			output[c] = value;
 		}
 		return output;
