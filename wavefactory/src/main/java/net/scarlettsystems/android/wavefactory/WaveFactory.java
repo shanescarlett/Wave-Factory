@@ -251,49 +251,6 @@ public class WaveFactory
 	 */
 	public static byte[] getSineToneRoundPCM16(double frequency, double minDuration, int sampleRate)
 	{
-//		//Buffer has extra space for 100 extra cycles to detect proper zero crossover
-//		int minDurationSampleCount = (int) (Math.round(minDuration * sampleRate));
-//		int numSamples = minDurationSampleCount * 2;
-//		int firstCrossoverIndex = 0;
-//		int properCrossoverIndex = 0;
-//		double sample[] = new double[numSamples];
-//
-//
-//		//Generate Waveform
-//		for (int i = 0; i < numSamples; ++i)
-//		{
-//			sample[i] = Math.sin(frequency * 2 * Math.PI * i / (sampleRate));
-//			if(i >= minDurationSampleCount)
-//			{
-//				//Find first point where wave crosses from negative to zero (a cycle is finished).
-//				//This index is kept just in case a minimal crossover point is not found.
-//				if(firstCrossoverIndex == 0 && sample[i - 1] < 0 && sample[i] >= 0)
-//				{
-//					firstCrossoverIndex = i;
-//				}
-//				//Check for a zero crossover point where the end of the wave coincides with the sample bins,
-//				//or is very close to it.
-//				if(sample[i - 1] < 0 && sample[i] >= 0 && sample[i] <= 0.005)
-//				{
-//					properCrossoverIndex = i;
-//					break;
-//				}
-//			}
-//		}
-//		int zeroCrossover = Math.max(firstCrossoverIndex, properCrossoverIndex);
-//		byte generatedSnd[] = new byte[2 * zeroCrossover];
-//		int idx = 0;
-//
-//		for (int i = 0; i < zeroCrossover; ++i)
-//		{
-//			double dVal = sample[i];
-//			// scale to maximum amplitude
-//			final short val = (short) ((dVal * Short.MAX_VALUE));
-//			// in 16 bit wav PCM, first byte is the low order byte
-//			generatedSnd[idx++] = (byte) (val & 0x00ff);
-//			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-//		}
-//		return generatedSnd;
 		return WaveLoader.floatToPcm(getSineToneRoundPCMFloat(frequency, minDuration, sampleRate));
 	}
 
