@@ -36,7 +36,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		byte waveBytes[] = new byte[2 * numSamples];
+		byte[] waveBytes = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -63,7 +63,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		float waveFloats[] = new float[numSamples];
+		float[] waveFloats = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -90,7 +90,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		byte waveBytes[] = new byte[2 * numSamples];
+		byte[] waveBytes = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -117,7 +117,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		float waveFloats[] = new float[numSamples];
+		float[] waveFloats = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -144,7 +144,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		byte waveBytes[] = new byte[2 * numSamples];
+		byte[] waveBytes = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -171,7 +171,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		float waveFloats[] = new float[numSamples];
+		float[] waveFloats = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -198,7 +198,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		byte waveBytes[] = new byte[2 * numSamples];
+		byte[] waveBytes = new byte[2 * numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -225,7 +225,7 @@ public class WaveFactory
 	{
 		validateInputs(frequency, duration, sampleRate, ramp);
 		int numSamples = (int)Math.floor(duration * sampleRate);
-		float waveFloats[] = new float[numSamples];
+		float[] waveFloats = new float[numSamples];
 		SampleMapFunction mapFunction = new SampleMapFunction()
 		{
 			@Override
@@ -272,7 +272,7 @@ public class WaveFactory
 		int numSamples = minDurationSampleCount * 2;
 		int firstCrossoverIndex = 0;
 		int properCrossoverIndex = 0;
-		float sample[] = new float[numSamples];
+		float[] sample = new float[numSamples];
 
 		float prevValue = 0;
 		for(int c = minDurationSampleCount; c < numSamples; c++)
@@ -294,7 +294,7 @@ public class WaveFactory
 			prevValue = value;
 		}
 		int zeroCrossover = Math.max(firstCrossoverIndex, properCrossoverIndex);
-		float output[] = new float[zeroCrossover];
+		float[] output = new float[zeroCrossover];
 
 		//Generate Waveform
 		for (int c = 0; c < zeroCrossover; c++)
@@ -359,7 +359,7 @@ public class WaveFactory
 		int numSamples = minDurationSampleCount * 2;
 		int firstCrossoverIndex = 0;
 		int properCrossoverIndex = 0;
-		float sample[] = new float[numSamples];
+		float[] sample = new float[numSamples];
 
 		float prevValue = 0;
 		for(int c = minDurationSampleCount; c < numSamples; c++)
@@ -375,7 +375,7 @@ public class WaveFactory
 			}
 			prevValue = value;
 		}
-		float output[] = new float[firstCrossoverIndex];
+		float[] output = new float[firstCrossoverIndex];
 
 		//Generate Waveform
 		for (int c = 0; c < firstCrossoverIndex; c++)
@@ -414,7 +414,7 @@ public class WaveFactory
 	public static byte[] getSilencePCM16(float duration, int sampleRate)
 	{
 		int numSamples = (int) (Math.floor(duration * sampleRate));
-		byte generatedSnd[] = new byte[2 * numSamples];
+		byte[] generatedSnd = new byte[2 * numSamples];
 		int idx = 0;
 		for (int i = 0; i < numSamples; ++i)
 		{
@@ -434,7 +434,7 @@ public class WaveFactory
 	public static float[] getSilencePCMFloat(float duration, int sampleRate)
 	{
 		int numSamples = (int) (Math.floor(duration * sampleRate));
-		float generatedSnd[] = new float[numSamples];
+		float[] generatedSnd = new float[numSamples];
 		int idx = 0;
 		for (int i = 0; i < numSamples; i++)
 		{
@@ -449,7 +449,7 @@ public class WaveFactory
 		{
 			throw new IllegalArgumentException("Frequency must be greater than zero.");
 		}
-		if(frequency > sampleRate/2)
+		if(frequency > sampleRate/2f)
 		{
 			throw new IllegalArgumentException("Frequency must be smaller than the nyquist frequency; i.e., half of the sampling rate.");
 		}
@@ -515,7 +515,7 @@ public class WaveFactory
 
 		for (i = 0; i < rampSamples; i++)
 		{
-			output[i] = mapFunction.map(i) * (i / rampSamples);
+			output[i] = mapFunction.map(i) * (i / (float)rampSamples);
 		}
 		for (; i < numSamples - rampSamples; i++)
 		{
@@ -523,7 +523,7 @@ public class WaveFactory
 		}
 		for (; i < numSamples; ++i)
 		{
-			output[i] = mapFunction.map(i) * ((numSamples - i) / rampSamples);
+			output[i] = mapFunction.map(i) * ((numSamples - i) / (float)rampSamples);
 		}
 	}
 }
