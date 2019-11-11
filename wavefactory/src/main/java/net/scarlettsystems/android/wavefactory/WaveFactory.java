@@ -304,13 +304,8 @@ public class WaveFactory
 		return output;
 	}
 
-	public static byte[] getSquareToneRoundPCM16(double frequency, double minDuration, int sampleRate)
-	{
-		return WaveLoader.floatToPcm(getSquareToneRoundPCMFloat(frequency, minDuration, sampleRate));
-	}
-
 	/**
-	 * Generate a sine wave of specified frequency and sample rate, with a minimum duration of
+	 * Generate a square wave of specified frequency and sample rate, with a minimum duration of
 	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
 	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
 	 * (e.g. in a looped tone) is more important than the absolute length.
@@ -318,10 +313,47 @@ public class WaveFactory
 	 * @param frequency frequency of the waveform in Hz
 	 * @param minDuration minimum duration of the waveform in seconds
 	 * @param sampleRate sample rate of the waveform in Hz
+	 * @return 16-bit PCM array of the generated waveform
+	 */
+	public static byte[] getSquareToneRoundPCM16(double frequency, double minDuration, int sampleRate)
+	{
+		return getSquareToneRoundPCM16(frequency, minDuration, sampleRate, 1.0f);
+	}
+
+	/**
+	 * Generate a square wave of specified frequency and sample rate, with a minimum duration of
+	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
+	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
+	 * (e.g. in a looped tone) is more important than the absolute length.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param minDuration minimum duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param amplitude magnitude from 0 to 1 of the generated waveform
+	 * @return 16-bit PCM array of the generated waveform
+	 */
+	public static byte[] getSquareToneRoundPCM16(double frequency, double minDuration, int sampleRate, float amplitude)
+	{
+		return WaveLoader.floatToPcm(getSquareToneRoundPCMFloat(frequency, minDuration, sampleRate, amplitude));
+	}
+
+	/**
+	 * Generate a square wave of specified frequency and sample rate, with a minimum duration of
+	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
+	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
+	 * (e.g. in a looped tone) is more important than the absolute length.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param minDuration minimum duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @param amplitude magnitude from 0 to 1 of the generated waveform
 	 * @return 32-bit float PCM array of the generated waveform
 	 */
-	public static float[] getSquareToneRoundPCMFloat(double frequency, double minDuration, int sampleRate)
+	public static float[] getSquareToneRoundPCMFloat(double frequency, double minDuration, int sampleRate, float amplitude)
 	{
+		//Amplitude sanity checks
+		if(amplitude < 0){amplitude = 0;}
+		if(amplitude > 1){amplitude = 1;}
 		//Buffer has extra space for 100 extra cycles to detect proper zero crossover
 		int minDurationSampleCount = (int) (Math.floor(minDuration * sampleRate));
 		int numSamples = minDurationSampleCount * 2;
@@ -333,8 +365,8 @@ public class WaveFactory
 		for(int c = minDurationSampleCount; c < numSamples; c++)
 		{
 			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
-			if(value >= 0){value = 0.99f;}
-			else{value = -0.99f;}
+			if(value >= 0){value = amplitude;}
+			else{value = -amplitude;}
 			//Find first point where wave crosses from negative to zero (a cycle is finished).
 			//This index is kept just in case a minimal crossover point is not found.
 			if(firstCrossoverIndex == 0 && prevValue < 0 && value >= 0)
@@ -349,11 +381,27 @@ public class WaveFactory
 		for (int c = 0; c < firstCrossoverIndex; c++)
 		{
 			float value = (float)Math.sin(frequency * 2 * Math.PI * c / (sampleRate));
-			if(value >= 0){value = 0.99f;}
-			else{value = -0.99f;}
+			if(value >= 0){value = amplitude;}
+			else{value = -amplitude;}
 			output[c] = value;
 		}
 		return output;
+	}
+
+	/**
+	 * Generate a square wave of specified frequency and sample rate, with a minimum duration of
+	 * {@code minDuration}, but with additional extra wave cycles to ensure the zero crossover point
+	 * coincides with a sample. This is useful when a smooth concatenation to a subsequent wave
+	 * (e.g. in a looped tone) is more important than the absolute length.
+	 *
+	 * @param frequency frequency of the waveform in Hz
+	 * @param minDuration minimum duration of the waveform in seconds
+	 * @param sampleRate sample rate of the waveform in Hz
+	 * @return 32-bit float PCM array of the generated waveform
+	 */
+	public static float[] getSquareToneRoundPCMFloat(double frequency, double minDuration, int sampleRate)
+	{
+		return getSquareToneRoundPCMFloat(frequency, minDuration, sampleRate, 1.0f);
 	}
 
 	/**
